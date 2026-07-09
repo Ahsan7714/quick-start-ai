@@ -10,10 +10,21 @@ try {
   console.warn("DNS custom servers not configured:", err);
 }
 
- const connectDB=()=>{
+let isConnected = false;
 
-    mongoose.connect(process.env.DB_URI).then(()=>console.log("Database connected"))
-    .catch((err)=>console.log(err))
-    
-} 
-    module.exports={connectDB}
+const connectDB = async () => {
+  if (isConnected) {
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(process.env.DB_URI);
+    isConnected = db.connections[0].readyState === 1;
+    console.log("Database connected");
+  } catch (err) {
+    console.error("Database connection error:", err);
+    throw err;
+  }
+};
+
+module.exports = { connectDB };

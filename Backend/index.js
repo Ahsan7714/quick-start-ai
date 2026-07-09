@@ -14,7 +14,15 @@ const PORT = process.env.PORT || 3100;
 
 require("dotenv").config({ path: "./config/.env" });
 
-connectDB();
+// Middleware to ensure DB is connected before processing requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 const allowedOrigins = [
   'https://quick-start-ai-client.vercel.app'
