@@ -1,8 +1,14 @@
 const mongoose = require('mongoose');
 const dns = require('dns');
 
-// Configure custom DNS servers to resolve MongoDB SRV records (fixes querySrv ECONNREFUSED)
-dns.setServers(['8.8.8.8', '1.1.1.1']);
+try {
+  // Only configure custom DNS locally; Vercel handles SRV resolution natively
+  if (!process.env.VERCEL) {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  }
+} catch (err) {
+  console.warn("DNS custom servers not configured:", err);
+}
 
  const connectDB=()=>{
 
