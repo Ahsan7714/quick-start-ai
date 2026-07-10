@@ -83,17 +83,23 @@ npm install quickstart-ai-chatbot-widget
 
 ### 2. Import and Use the Widget
 ```jsx
+import React from 'react';
 import { ChatBot } from 'quickstart-ai-chatbot-widget';
 
-export default function App() {
+function App() {
   return (
-    <ChatBot 
-      token="A1ED-7127544F-1EBAF3E7" 
-      apiUrl="https://quick-start-ai-backend.vercel.app/api/v1"
-      wantToShowSuggestions={true}
-    />
+    <div>
+      <ChatBot 
+        token="YOUR_BUSINESS_TOKEN" 
+        apiUrl="https://your-api-endpoint.com/api/v1" // Your quickstart-ai backend URL
+        theme="primary"
+        wantToShowSuggestions={true}
+      />
+    </div>
   );
 }
+
+export default App;
 ```
 
 ---
