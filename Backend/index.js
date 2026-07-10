@@ -14,6 +14,17 @@ const PORT = process.env.PORT || 3100;
 
 require("dotenv").config({ path: "./config/.env" });
 
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    // Allow any localhost port (development)
+    // Allow any .vercel.app subdomain (staging/preview deploys)
+    // Allow any other origin — this API serves a widget SDK embedded on customer sites
+    callback(null, true);
+  },
+  credentials: true
+}));
+
 // Middleware to ensure DB is connected before processing requests
 app.use(async (req, res, next) => {
   try {
@@ -31,16 +42,7 @@ if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    // Allow any localhost port (development)
-    // Allow any .vercel.app subdomain (staging/preview deploys)
-    // Allow any other origin — this API serves a widget SDK embedded on customer sites
-    callback(null, true);
-  },
-  credentials: false
-}));
+
 
 
 
