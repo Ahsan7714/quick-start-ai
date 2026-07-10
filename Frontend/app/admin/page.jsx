@@ -60,7 +60,7 @@ export default function AdminDashboard() {
       <aside className="w-64 bg-gray-900 p-4">
         <h2 className="text-2xl font-bold mb-6">Quickstart Admin</h2>
         <nav className="space-y-2">
-          {["overview", "users", "plans"].map((tab) => (
+          {["overview", "users"].map((tab) => (
             <button
               key={tab}
               className={`roboty-headings w-full text-left py-2 px-4 rounded ${
@@ -162,55 +162,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === "plans" && (
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Subscription Plans</h3>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded flex items-center">
-                <Plus className="mr-2 h-4 w-4" /> Add Plan
-              </button>
-            </div>
-            <table className="w-full">
-              <thead>
-                <tr className="text-left">
-                  <th className="pb-2">Plan Name</th>
-                  <th className="pb-2">Price</th>
-                  <th className="pb-2">Features</th>
-                  <th className="pb-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    name: "Basic",
-                    price: "$9.99/mo",
-                    features: "100 chats, 1 website",
-                  },
-                  {
-                    name: "Pro",
-                    price: "$19.99/mo",
-                    features: "500 chats, 3 websites",
-                  },
-                  {
-                    name: "Enterprise",
-                    price: "$49.99/mo",
-                    features: "Unlimited chats, 10 websites",
-                  },
-                ].map((plan, index) => (
-                  <tr key={index} className="border-t border-gray-700">
-                    <td className="py-2">{plan.name}</td>
-                    <td className="py-2">{plan.price}</td>
-                    <td className="py-2">{plan.features}</td>
-                    <td className="py-2">
-                      <button className="text-blue-400 mr-2">Edit</button>
-                      <button className="text-red-400">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
         {/* Modal for adding a new user */}
         {showModal && (
