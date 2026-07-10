@@ -54,6 +54,14 @@ export default function UserDashboard() {
     }
   }, [isLoggedOut, loading, router]);
 
+  useEffect(() => {
+    if (user?.bussinessDetails && user.bussinessDetails.length < 5) {
+      if (activeTab !== "business details") {
+        setActiveTab("business details");
+      }
+    }
+  }, [user?.bussinessDetails?.length, activeTab]);
+
   const handleLogout = () => {
     dispatch(logout());
   };
@@ -73,32 +81,48 @@ export default function UserDashboard() {
           </Link>
         </div>
         <nav className="space-y-4 mt-3">
-          {tabs.map((tab) => (
-            <button
-              key={tab.name}
-              className={`text-lg open-sans-headings flex items-center w-full text-left py-3 px-5 rounded transition-all duration-300 ${
-                activeTab === tab.name
-                  ? "bg-[#9E45F1] text-white"
-                  : "hover:bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => {
-                setActiveTab(tab.name);
-                setIsSidebarOpen(false); // Close the sidebar after clicking a tab
-              }}
-            >
-              {/* Update the icon color based on the activeTab */}
-              <span
-                className={`mr-3 text-2xl ${
-                  activeTab === tab.name ? "text-white" : "text-gray-600"
-                }`}
+          {tabs.map((tab) => {
+            const isLocked =
+              tab.name !== "business details" &&
+              (!user?.bussinessDetails || user.bussinessDetails.length < 5);
+            return (
+              <button
+                key={tab.name}
+                className={`text-lg open-sans-headings flex items-center w-full text-left py-3 px-5 rounded transition-all duration-300 ${
+                  activeTab === tab.name && !isLocked
+                    ? "bg-[#9E45F1] text-white"
+                    : "hover:bg-gray-200 text-gray-700"
+                } ${isLocked ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => {
+                  if (isLocked) {
+                    toast.error(
+                      `Please add at least 5 business details to unlock this feature. Currently you have ${
+                        user?.bussinessDetails?.length || 0
+                      }/5.`
+                    );
+                    return;
+                  }
+                  setActiveTab(tab.name);
+                  setIsSidebarOpen(false); // Close the sidebar after clicking a tab
+                }}
               >
-                {tab.icon}
-              </span>
-              <span className="text-lg font-semibold">
-                {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
-              </span>
-            </button>
-          ))}
+                {/* Update the icon color based on the activeTab */}
+                <span
+                  className={`mr-3 text-2xl ${
+                    activeTab === tab.name && !isLocked
+                      ? "text-white"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {tab.icon}
+                </span>
+                <span className="text-lg font-semibold flex-1">
+                  {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
+                </span>
+                {isLocked && <span className="text-sm text-gray-400">🔒</span>}
+              </button>
+            );
+          })}
         </nav>
       </aside>
 

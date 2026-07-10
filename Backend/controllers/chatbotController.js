@@ -30,10 +30,10 @@ exports.getResponse = catchAsyncError(async (req, res, next) => {
 
   const bussinessDetails = owner.bussinessDetails;
 
-  if (!bussinessDetails || bussinessDetails.length < 1) {
+  if (!bussinessDetails || bussinessDetails.length < 5) {
     return res.status(400).json({
       success: false,
-      message: "Not enough business details",
+      message: "Please add at least 5 business details to use the chatbot",
     });
   }
 
@@ -109,9 +109,14 @@ exports.testByOwner = catchAsyncError(async (req, res, next) => {
 
   const { bussinessDetails } = owner;
 
-  const businessDetailsText = bussinessDetails && bussinessDetails.length > 0
-    ? bussinessDetails.map(detail => `Q: ${detail.question}\nA: ${detail.answer}`).join("\n")
-    : "No business details available";
+  if (!bussinessDetails || bussinessDetails.length < 5) {
+    return res.status(400).json({
+      success: false,
+      message: "Please add at least 5 business details to test the chatbot",
+    });
+  }
+
+  const businessDetailsText = bussinessDetails.map(detail => `Q: ${detail.question}\nA: ${detail.answer}`).join("\n");
 
   const messagesText = messages && messages.length > 0
     ? messages.map(detail => `Customer: ${detail.question}\nBot: ${detail.answer}`).join("\n")
