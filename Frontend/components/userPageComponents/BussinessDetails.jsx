@@ -260,6 +260,10 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
                   onChange={handleChange}
                   required
                   placeholder="What is our Company Objective? 🚀"
+                  onFocus={(e) => (e.target.placeholder = "")}
+                  onBlur={(e) =>
+                    (e.target.placeholder = "What is our Company Objective? 🚀")
+                  }
                   className="mt-2 block w-full border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring focus:ring-blue-500"
                 />
                 <FaRobot className="absolute right-3 top-3 text-xl text-[#9e45f1]" />
@@ -277,6 +281,11 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
                   onChange={handleChange}
                   required
                   placeholder="Our objective is to provide the best services to our customers... 💼"
+                  onFocus={(e) => (e.target.placeholder = "")}
+                  onBlur={(e) =>
+                    (e.target.placeholder =
+                      "Our objective is to provide the best services to our customers... 💼")
+                  }
                   rows={4}
                   className="mt-2 block w-full border border-gray-200 bg-white text-gray-900 placeholder-gray-400  "
                 />
