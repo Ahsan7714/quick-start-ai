@@ -5,7 +5,6 @@ import Footer from "@/components/footer";
 import About from "@/components/about";
 import Faq from "@/components/faq";
 import Feature from "@/components/feature";
-import Contact from "@/components/contact";
 import { ChatBot } from "quickstart-ai-chatbot-widget";
 import { useEffect } from "react";
 import { loadUser } from "@/slices/userSlice";
@@ -37,9 +36,6 @@ export default function Home() {
       </section>
       <section id="faq">
         <Faq />
-      </section>
-      <section id="contact">
-        <Contact />
       </section>
       <Footer />
 

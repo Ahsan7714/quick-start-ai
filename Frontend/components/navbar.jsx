@@ -58,12 +58,6 @@ export default function Navbar() {
 
           {/* Desktop Buttons */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <a
-              href="#contact"
-              className=" text-purple-600 hover:bg-gradient-purple-100 rounded-full transition-all ease-in-out duration-300"
-            >
-              CONTACT US
-            </a>
             {/* Display the proper button based on login status */}
             {loading ? (
               <div className="ml-2 w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
@@ -124,12 +118,7 @@ export default function Navbar() {
 
               {/* Mobile Buttons */}
               <div className="mt-4 space-y-1">
-                <a
-                  href="#contact"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-600"
-                >
-                  CONTACT US
-                </a>
+                {/* Display the proper button based on login status */}
                 {loading ? (
                   <div className="w-full h-8 rounded-full bg-gray-200 animate-pulse"></div>
                 ) : user ? (

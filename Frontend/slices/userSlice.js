@@ -12,7 +12,6 @@ const initialState = {
   token: null,
   isBusinessDetailsAdded: false,
   isBusinessDetailsDeleted: false,
-  isContactUsMessageSent: false,
   sessions: [],
   messages: [],
   data:[],
@@ -125,20 +124,7 @@ export const deleteBusinessDetails = createAsyncThunk(
   }
 );
 
-// send contact us message
-export const sendContactUsMessage = createAsyncThunk(
-  "user/sendContactUsMessage",
-  async (payload, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await axios.post(`${baseurl}/user/contact`, payload, {
-        withCredentials: true,
-      });
-      return fulfillWithValue(data);
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
+
 // get all sessions
 export const getAllSessions = createAsyncThunk(
   "user/getAllSessions",
@@ -212,7 +198,6 @@ const userReducer = createSlice({
       state.isTokenGenerated = false;
       state.isBusinessDetailsAdded= false;
       state.isBusinessDetailsDeleted = false;
-      state.isContactUsMessageSent = false;
       state.sessions = [];
       state.messages = [];
       state.data = [];
@@ -293,18 +278,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.loading = false;
       state.error = action?.payload?.message;
     });
-    // send contact us message
-    builder.addCase(sendContactUsMessage.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(sendContactUsMessage.fulfilled, (state) => {
-      state.loading = false;
-      state.isContactUsMessageSent = true;
-    });
-    builder.addCase(sendContactUsMessage.rejected, (state,action) => {
-      state.loading = false;
-      state.error = action?.payload?.message;
-    });
+
     // get all sessions
     builder.addCase(getAllSessions.pending, (state) => {
       state.loading = true;
