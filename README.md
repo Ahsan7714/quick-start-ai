@@ -45,7 +45,6 @@ QuickStart AI is a premium, full-stack SaaS platform designed to empower busines
 - **Embedded Chat Widget**: Integrate a floating conversational widget onto external websites.
 - **Interactive Playground**: Chatbot playground allowing real-time testing of system prompt behaviors, business detail context, and user input.
 - **Token Management**: Integrated Token Tracker panel to manage usage limits.
-- **Automated Mail Alerts**: Contact/inquiry form powered by Nodemailer that automatically notifies the project owners.
 
 ---
 
@@ -63,7 +62,6 @@ QuickStart AI is a premium, full-stack SaaS platform designed to empower busines
 - **Server**: Express.js
 - **Database**: MongoDB with Mongoose (configured with custom DNS resolution to prevent SRV lookup failures)
 - **AI Core**: Groq SDK (Llama 3.3 Llama-70b model)
-- **Email System**: Nodemailer (sending notifications to admins)
 - **Security & Performance**: Express Rate Limit, Cookie Parser, Compression, Cors, and Morgan logging.
 
 ---
@@ -125,9 +123,6 @@ export default App;
    JWT_EXPIRE=10d
    CRYPTO_SECRET_KEY=your_crypto_secret
    GROQ_API_KEY=your_groq_api_key
-   SMPT_SERVICE=gmail
-   SMPT_MAIL=your_email@gmail.com
-   SMPT_PASSWORD=your_email_app_password
    ```
 4. Start the backend server:
    ```bash
