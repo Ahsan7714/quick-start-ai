@@ -6,7 +6,7 @@ import About from "@/components/about";
 import Faq from "@/components/faq";
 import Feature from "@/components/feature";
 import Contact from "@/components/contact";
-import { ChatBot } from "chatbot-widget";
+import { ChatBot } from "quickstart-ai-chatbot-widget";
 import { useEffect } from "react";
 import { loadUser } from "@/slices/userSlice";
 import { useDispatch } from "react-redux";
@@ -49,8 +49,9 @@ export default function Home() {
 
 
       {/* Hot reload triggered */}
-      <ChatBot token="A1ED-7127544F-1EBAF3E7"
-        theme="secondary"
+      <ChatBot 
+        token="A1ED-7127544F-1EBAF3E7" 
+        apiUrl="https://quick-start-ai-backend.vercel.app/api/v1"
         wantToShowSuggestions={true}
       />
     </main>
