@@ -52,6 +52,7 @@ export default function Home() {
       <ChatBot 
         token="A1ED-7127544F-1EBAF3E7" 
         apiUrl="https://quick-start-ai-backend.vercel.app/api/v1"
+        theme="secondary"
         wantToShowSuggestions={true}
       />
     </main>
