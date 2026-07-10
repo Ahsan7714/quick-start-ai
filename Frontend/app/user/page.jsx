@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  Bell,
   LogOut,
   User,
   Settings,
@@ -18,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { logout, clearState, loadUser } from "@/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "components/ui/avatar";
 import Link from "next/link";
 
 export default function UserDashboard() {
@@ -26,7 +24,6 @@ export default function UserDashboard() {
   const { isLoggedOut, loading, user } = useSelector((state) => state.user);
 
   const [activeTab, setActiveTab] = useState("business details");
-  const [showLogoutMenu, setShowLogoutMenu] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For responsive sidebar toggle
 
   // Define tabs
@@ -59,11 +56,6 @@ export default function UserDashboard() {
 
   const handleLogout = () => {
     dispatch(logout());
-    toggleLogoutMenu();
-  };
-
-  const toggleLogoutMenu = () => {
-    setShowLogoutMenu((prev) => !prev);
   };
 
   return (
@@ -107,15 +99,6 @@ export default function UserDashboard() {
               </span>
             </button>
           ))}
-          <button
-            className="text-lg open-sans-headings flex items-center w-full text-left py-3 px-5 rounded transition-all duration-300 hover:bg-gray-200 text-gray-700"
-            onClick={handleLogout}
-          >
-            <span className="mr-3 text-2xl text-gray-600">
-              <LogOut className="h-6 w-6" />
-            </span>
-            <span className="text-lg font-semibold">Logout</span>
-          </button>
         </nav>
       </aside>
 
@@ -129,29 +112,13 @@ export default function UserDashboard() {
           </h1>
 
           <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full hover:bg-gray-200 hidden lg:block">
-              <Bell className="h-5 w-5" />
-            </button>
-
-            <div
-              className="relative w-8 h-8 cursor-pointer mb-2"
-              onClick={toggleLogoutMenu}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
             >
-              <Avatar>
-                <AvatarImage src={user?.picture} alt={user?.businessName} />
-                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
-              {showLogoutMenu && (
-                <div className="absolute right-0 mt-2 text-gray-700 rounded-lg shadow-lg z-10 bg-white border">
-                  <button
-                    className="flex items-center p-2 hover:bg-gray-100 w-full"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" /> Logout
-                  </button>
-                </div>
-              )}
-            </div>
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
             <button
               className="block md:hidden p-2 rounded-md hover:bg-gray-200 "
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
