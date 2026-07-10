@@ -17,10 +17,6 @@ QuickStart AI is a premium, full-stack SaaS platform designed to empower busines
   ### 🏠 Landing Page
   ![QuickStart AI Home](previews/home.png)
 
-  ### 📊 Token Management Dashboard
-  Track your token usage, limits, and subscription tier in real-time.
-  ![Token Tab Dashboard](previews/tokentab.png)
-
   ### 🧠 Chatbot Training & FAQ Setup
   Easily train your chatbot by adding custom Business Details and FAQs.
   ![Training and FAQ Generator](previews/training%20tab.png)
