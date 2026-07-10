@@ -16,6 +16,7 @@ const initialState = {
   messages: [],
   data:[],
   isLoggedOut: false,
+  isInitialized: false,
 };
 
 // signup user
@@ -202,6 +203,7 @@ const userReducer = createSlice({
       state.messages = [];
       state.data = [];
       state.isLoggedOut = false;
+      state.isInitialized = false;
     },
   },
   extraReducers: (builder) => {
@@ -235,9 +237,11 @@ state.error = action.payload?.message || action.payload || "Something went wrong
     builder.addCase(loadUser.fulfilled, (state, action) => {
       state.loading = false;
       state.user = action.payload;
+      state.isInitialized = true;
     });
     builder.addCase(loadUser.rejected, (state) => {
       state.loading = false;
+      state.isInitialized = true;
     });
     // generate new token
     builder.addCase(generateNewToken.pending, (state) => {

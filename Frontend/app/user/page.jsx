@@ -18,10 +18,11 @@ import { logout, clearState, loadUser } from "@/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Loader from "components/Loader";
 
 export default function UserDashboard() {
   const dispatch = useDispatch();
-  const { isLoggedOut, loading, user } = useSelector((state) => state.user);
+  const { isLoggedOut, loading, user, isInitialized } = useSelector((state) => state.user);
 
   const [activeTab, setActiveTab] = useState("business details");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For responsive sidebar toggle
@@ -39,12 +40,12 @@ export default function UserDashboard() {
   }, [dispatch]);
 
   useEffect(() => {
-    // const isLoggedIn = true; // Replace with actual login check
-    if (!user) {
+    // Only check redirect if auth initialization has finished
+    if (isInitialized && !user) {
       router.push("/start");
       clearState();
     }
-  }, [router]);
+  }, [isInitialized, user, router]);
 
   useEffect(() => {
     if (isLoggedOut) {
@@ -65,6 +66,14 @@ export default function UserDashboard() {
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 text-gray-800">
