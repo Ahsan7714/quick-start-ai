@@ -85,7 +85,7 @@ function App() {
     <div>
       <ChatBot 
         token="YOUR_BUSINESS_TOKEN" 
-        apiUrl="https://your-api-endpoint.com/api/v1" // Your quickstart-ai backend URL
+        apiUrl="https://quick-start-ai-backend.vercel.app/api/v1" // Your quickstart-ai backend URL
         theme="primary"
         wantToShowSuggestions={true}
       />
