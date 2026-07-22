@@ -11,6 +11,7 @@ const initialState = {
   isTokenGenerated: false,
   token: null,
   isBusinessDetailsAdded: false,
+  isBusinessDetailsUpdated: false,
   isBusinessDetailsDeleted: false,
   sessions: [],
   messages: [],
@@ -110,6 +111,23 @@ export const addBusinessDetails = createAsyncThunk(
   }
 );
 
+// update business details
+export const updateBusinessDetails = createAsyncThunk(
+  "user/updateBusinessDetails",
+  async ({ id, question, answer }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await axios.put(
+        `${baseurl}/user/businessDetails/${id}`,
+        { question, answer },
+        { withCredentials: true }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // delete business details
 export const deleteBusinessDetails = createAsyncThunk(
   "user/deleteBusinessDetails",
@@ -198,6 +216,7 @@ const userReducer = createSlice({
       state.user = null;
       state.isTokenGenerated = false;
       state.isBusinessDetailsAdded= false;
+      state.isBusinessDetailsUpdated = false;
       state.isBusinessDetailsDeleted = false;
       state.sessions = [];
       state.messages = [];
@@ -256,7 +275,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.error = action?.payload?.message;
     });
     // add business details
-    builder.addCase(addBusinessDetails.pending, (state,action) => {
+    builder.addCase(addBusinessDetails.pending, (state) => {
       state.loading = true;
       state.isBusinessDetailsAdded = false;
     });
@@ -264,10 +283,24 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.loading = false;
       state.isBusinessDetailsAdded = true;
     });
-    builder.addCase(addBusinessDetails.rejected, (state) => {
+    builder.addCase(addBusinessDetails.rejected, (state, action) => {
       state.loading = false;
       state.error = action?.payload?.message;
       state.isBusinessDetailsAdded = false;
+    });
+    // update business details
+    builder.addCase(updateBusinessDetails.pending, (state) => {
+      state.loading = true;
+      state.isBusinessDetailsUpdated = false;
+    });
+    builder.addCase(updateBusinessDetails.fulfilled, (state) => {
+      state.loading = false;
+      state.isBusinessDetailsUpdated = true;
+    });
+    builder.addCase(updateBusinessDetails.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action?.payload?.message;
+      state.isBusinessDetailsUpdated = false;
     });
     // delete business details
     builder.addCase(deleteBusinessDetails.pending, (state) => {
@@ -278,7 +311,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.loading = false;
       state.isBusinessDetailsDeleted = true;
     });
-    builder.addCase(deleteBusinessDetails.rejected, (state,action) => {
+    builder.addCase(deleteBusinessDetails.rejected, (state, action) => {
       state.loading = false;
       state.error = action?.payload?.message;
     });

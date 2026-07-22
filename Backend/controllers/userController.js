@@ -119,37 +119,79 @@ exports.loadUserProfile = catchAsyncError(async (req, res, next) => {
   });
 });
 
-// add business details
+// add business details (supports single pair or array of pairs)
 exports.addBussinessDetails = catchAsyncError(async (req, res, next) => {
-  const { question, answer } = req.body;
-console.log(req.body)
+  const { question, answer, details } = req.body;
   const user = req.user;
-  const bussinessDetails = user.bussinessDetails;
 
-  if (!question || !answer) {
+  let itemsToAdd = [];
+
+  if (Array.isArray(details) && details.length > 0) {
+    itemsToAdd = details.filter((item) => item.question && item.question.trim() && item.answer && item.answer.trim());
+  } else if (question && answer) {
+    itemsToAdd = [{ question, answer }];
+  }
+
+  if (itemsToAdd.length === 0) {
     return res.status(400).json({
       success: false,
-      message: "Please enter all fields",
+      message: "Please enter question and answer for at least one item",
     });
   }
 
-  if (bussinessDetails.length >= 15) {
+  if (user.bussinessDetails.length + itemsToAdd.length > 50) {
     return res.status(400).json({
       success: false,
-      message: "Details limit reached.You can't add more details",
+      message: "Details limit reached. You cannot add more details (max 50)",
     });
   }
 
-  bussinessDetails.push({ question, answer });
+  itemsToAdd.forEach((item) => {
+    user.bussinessDetails.push({
+      question: item.question.trim(),
+      answer: item.answer.trim(),
+    });
+  });
 
   await user.save();
 
   res.status(200).json({
     success: true,
-    message: "Bussiness details added successfully",
+    message: "Business details added successfully",
+    bussinessDetails: user.bussinessDetails,
   });
 });
 
+// update business detail
+exports.updateBussinessDetails = catchAsyncError(async (req, res, next) => {
+  const user = req.user;
+  const { id } = req.params;
+  const { question, answer } = req.body;
+
+  const index = user.bussinessDetails.findIndex(
+    (bussinessDetail) => bussinessDetail._id.toString() === id.toString()
+  );
+
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      message: "Business detail not found",
+    });
+  }
+
+  if (question !== undefined) user.bussinessDetails[index].question = question.trim();
+  if (answer !== undefined) user.bussinessDetails[index].answer = answer.trim();
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Business detail updated successfully",
+    bussinessDetails: user.bussinessDetails,
+  });
+});
+
+// delete business details
 exports.deleteBussinessDetails = catchAsyncError(async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
@@ -157,18 +199,24 @@ exports.deleteBussinessDetails = catchAsyncError(async (req, res, next) => {
   const bussinessDetails = user.bussinessDetails;
 
   const index = bussinessDetails.findIndex(
-    (bussinessDetail) => bussinessDetail._id === id
+    (bussinessDetail) => bussinessDetail._id.toString() === id.toString()
   );
 
   if (index > -1) {
     bussinessDetails.splice(index, 1);
+  } else {
+    return res.status(404).json({
+      success: false,
+      message: "Business detail not found",
+    });
   }
 
   await user.save();
 
   res.status(200).json({
     success: true,
-    message: "Bussiness details deleted successfully",
+    message: "Business detail deleted successfully",
+    bussinessDetails: user.bussinessDetails,
   });
 });
 

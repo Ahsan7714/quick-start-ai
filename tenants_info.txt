@@ -1,0 +1,80 @@
+================================================================================
+QUICKSTART AI - MULTI-TENANT TEST DATA & SETUP DETAILS
+================================================================================
+
+--------------------------------------------------------------------------------
+TENANT 1: NexusCloud Solutions (Tech & Cloud Infrastructure)
+--------------------------------------------------------------------------------
+
+SIGNUP FORM DETAILS:
+- Name: Sarah Jenkins
+- Email address: sarah@nexuscloud.example.com
+- Password: NexusCloud2026!
+- Business Name: NexusCloud Solutions
+- Business Description: NexusCloud Solutions provides enterprise cloud hosting, automated database backups, serverless deployment tools, and 24/7 infrastructure support for modern software development teams.
+- Business Category: Technology & Cloud Infrastructure
+
+FAQ TRAINING DATA (8 Q&A Pairs):
+
+1. Q: What cloud hosting plans do you offer?
+   A: We offer Starter, Professional, and Enterprise cloud hosting plans tailored for projects of all scales.
+
+2. Q: What is your service uptime guarantee?
+   A: We guarantee a 99.99% service uptime backed by our Service Level Agreement (SLA).
+
+3. Q: How do automated database backups work?
+   A: Automated backups run daily at midnight UTC and are securely stored in geo-redundant storage for 30 days.
+
+4. Q: Are free SSL certificates included?
+   A: Yes, all custom domains connected to NexusCloud include free, automatic SSL certificate provisioning.
+
+5. Q: How can I upgrade or downgrade my hosting tier?
+   A: You can instantly upgrade or downgrade your plan at any time directly from the Billing tab in your account dashboard.
+
+6. Q: What server regions are available for deployment?
+   A: We operate data center nodes across US-East (N. Virginia), US-West (Oregon), Europe (Frankfurt), and Asia-Pacific (Singapore).
+
+7. Q: Is 24/7 technical support included?
+   A: Priority 24/7 ticket and live chat support are included for all Professional and Enterprise tier customers.
+
+8. Q: How do I migrate an existing server to NexusCloud?
+   A: Our platform includes a free automated server migration tool, and our technical support team is available to assist with complex migrations.
+
+
+--------------------------------------------------------------------------------
+TENANT 2: VeloVita Wellness Hub (Health & Fitness)
+--------------------------------------------------------------------------------
+
+SIGNUP FORM DETAILS:
+- Name: Marcus Vance
+- Email address: marcus@velovita.example.com
+- Password: VeloVitaFit2026!
+- Business Name: VeloVita Wellness Hub
+- Business Description: VeloVita Wellness Hub is a premier fitness center and online wellness coaching platform offering personalized workout routines, nutrition planning, and live group fitness classes.
+- Business Category: Health & Fitness
+
+FAQ TRAINING DATA (8 Q&A Pairs):
+
+1. Q: What are your gym operating hours?
+   A: Our facilities are open Monday through Friday from 5:00 AM to 11:00 PM, and weekends from 7:00 AM to 8:00 PM.
+
+2. Q: Do you offer a free trial pass?
+   A: Yes! We provide a 3-day complimentary access pass for all first-time local visitors.
+
+3. Q: Are personal training sessions included in the membership?
+   A: Standard memberships include one complimentary fitness assessment and orientation session. Dedicated 1-on-1 personal training packages can be added separately.
+
+4. Q: How do I reserve a spot in group fitness classes?
+   A: You can reserve spots for Yoga, HIIT, and Spin classes up to 7 days in advance via our mobile app or web portal.
+
+5. Q: What is your membership cancellation policy?
+   A: Memberships can be canceled anytime with a 30-day written notice submitted through your account portal without hidden cancellation penalties.
+
+6. Q: Do you provide personalized nutrition and meal plans?
+   A: Yes, our certified nutritionists design customized meal plans tailored to your specific fitness objectives and dietary preferences.
+
+7. Q: Is locker room and sauna access included?
+   A: Full access to executive locker rooms, digital lockers, private showers, and infrared saunas is included with all active memberships.
+
+8. Q: Can I freeze my membership while traveling?
+   A: Yes, members can freeze their membership for up to 60 days per calendar year free of charge.

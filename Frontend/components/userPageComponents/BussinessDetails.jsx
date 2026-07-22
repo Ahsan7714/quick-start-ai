@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { MdDeleteOutline, MdInfoOutline } from "react-icons/md";
-import { FaRobot, FaCommentDots, FaBolt } from "react-icons/fa";
+import { MdDeleteOutline, MdInfoOutline, MdOutlineEdit } from "react-icons/md";
+import { FaRobot, FaCommentDots } from "react-icons/fa";
 import {
   List,
   LayoutGrid,
-  ArrowDown,
-  ArrowDown01,
-  ArrowDownIcon,
-  ArrowDownToDot,
-  ArrowUpDown,
   ChevronDown,
-  DeleteIcon,
-  Delete,
   Trash2,
+  Plus,
+  Pencil,
+  X,
 } from "lucide-react";
 import { generateJSONContent } from "@/lib/groq";
 
-import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
+import { CardHeader, CardTitle, CardContent } from "components/ui/card";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Textarea } from "components/ui/textarea";
@@ -35,154 +31,237 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "components/ui/dialog";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   addBusinessDetails,
+  updateBusinessDetails,
   deleteBusinessDetails,
   loadUser,
   clearState,
-  getBussinessDetails,
 } from "@/slices/userSlice";
 import toast from "react-hot-toast";
 import { AiFillThunderbolt } from "react-icons/ai";
-import { systemPrompt } from "./prompt";
 import Loader from "../Loader";
 
 const BusinessDetails = () => {
   const dispatch = useDispatch();
   const [layout, setLayout] = useState("carousel");
-  const { isBusinessDetailsAdded, isBusinessDetailsDeleted, user, error } =
-    useSelector((state) => state.user);
+  const {
+    isBusinessDetailsAdded,
+    isBusinessDetailsUpdated,
+    isBusinessDetailsDeleted,
+    user,
+  } = useSelector((state) => state.user);
 
-  const [formData, setFormData] = useState({
-    question: "",
-    answer: "",
-  });
+  // Dynamic Q&A list for adding multiple questions + answers at once
+  const [qaList, setQaList] = useState([
+    { id: 1, question: "", answer: "" },
+  ]);
   const [loading, setLoading] = useState(false);
 
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
+  // Edit state
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    id: null,
+    question: "",
+    answer: "",
+  });
+
+  const handleAddField = () => {
+    setQaList((prev) => [
       ...prev,
-      [e.target.name]: e.target.value,
-    }));
+      { id: Date.now() + Math.random(), question: "", answer: "" },
+    ]);
+  };
+
+  const handleRemoveField = (id) => {
+    if (qaList.length > 1) {
+      setQaList((prev) => prev.filter((item) => item.id !== id));
+    }
+  };
+
+  const handleFieldChange = (id, fieldName, value) => {
+    setQaList((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, [fieldName]: value } : item
+      )
+    );
   };
 
   const handleDelete = async (id) => {
     setLoading(true);
-    dispatch(deleteBusinessDetails(id));
-
-    await loadUser();
-    setLoading(false);
-    toast.success("Business detail deleted successfully");
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    if (!formData.question || !formData.answer) {
-      toast.error("Please fill all the fields");
+    try {
+      await dispatch(deleteBusinessDetails(id)).unwrap();
+      toast.success("Business detail deleted successfully");
+      await dispatch(loadUser());
+    } catch (err) {
+      toast.error(err?.message || "Failed to delete detail");
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenEdit = (detail) => {
+    setEditFormData({
+      id: detail._id,
+      question: detail.question,
+      answer: detail.answer,
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (!editFormData.question.trim() || !editFormData.answer.trim()) {
+      toast.error("Please fill out both question and answer");
       return;
     }
-    await dispatch(addBusinessDetails(formData));
-    setLoading(false);
-    setFormData({
-      question: "",
-      answer: "",
-    });
-    toast.success("Business detail added successfully");
+    setLoading(true);
+    try {
+      await dispatch(
+        updateBusinessDetails({
+          id: editFormData.id,
+          question: editFormData.question,
+          answer: editFormData.answer,
+        })
+      ).unwrap();
+      toast.success("Business detail updated successfully");
+      setIsEditOpen(false);
+      await dispatch(loadUser());
+    } catch (err) {
+      toast.error(err?.message || "Failed to update detail");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validPairs = qaList.filter(
+      (item) => item.question.trim() !== "" && item.answer.trim() !== ""
+    );
+
+    if (validPairs.length === 0) {
+      toast.error("Please fill in at least one question and answer");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await dispatch(addBusinessDetails({ details: validPairs })).unwrap();
+      toast.success(
+        `${validPairs.length} business detail(s) added successfully`
+      );
+      setQaList([{ id: Date.now(), question: "", answer: "" }]);
+      await dispatch(loadUser());
+    } catch (err) {
+      toast.error(err?.message || "Failed to add business details");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGenerateAI = async () => {
     setLoading(true);
     const businessDetails = `
-      Business Name: ${user.bussinessName || "N/A"},
-      Business Category: ${user.bussinessCategory || "N/A"},
-      Business Description: ${user.bussinessDescription || "N/A"}
+      Business Name: ${user?.bussinessName || "N/A"},
+      Business Category: ${user?.bussinessCategory || "N/A"},
+      Business Description: ${user?.bussinessDescription || "N/A"}
     `;
 
     const prompt = `Generate exactly 5 AI questions for the following business details from user perspective (end users) which a user can ask from a chatbot about the business: ${businessDetails}.
 
-Please return an array of exactly 5 questions in JSON format. Each question should be an object with "question" and "answer" properties. The questions should be things customers would typically ask about this type of business. Format: [{"question": "What are your business hours?", "answer": "We are open Monday to Friday 9 AM to 6 PM"}]`;
+Please return an array of exactly 5 questions in JSON format. Each question should be an object with "question" and "answer" properties. Format: [{"question": "What are your business hours?", "answer": "We are open Monday to Friday 9 AM to 6 PM"}]`;
 
     try {
       const questions = await generateJSONContent(prompt);
-      
-      // Ensure we have an array
+
       if (Array.isArray(questions)) {
         setGeneratedQuestions(questions);
-      } else if (questions.content && Array.isArray(questions.content)) {
+      } else if (questions?.content && Array.isArray(questions.content)) {
         setGeneratedQuestions(questions.content);
       } else {
-        // Fallback: create some default questions
         setGeneratedQuestions([
           {
             question: "What services do you offer?",
-            answer: `We specialize in ${user.bussinessCategory || "various services"} and provide comprehensive solutions.`
+            answer: `We specialize in ${user?.bussinessCategory || "various services"} and provide comprehensive solutions.`,
           },
           {
-            question: "How can I contact you?",
-            answer: "You can reach us through our contact form or customer support."
+            question: "How can I contact support?",
+            answer: "You can reach out to our team through our official support channel.",
           },
           {
             question: "What makes your business unique?",
-            answer: user.bussinessDescription || "We are committed to providing excellent service to our customers."
+            answer: user?.bussinessDescription || "We are committed to providing top-quality services.",
           },
           {
             question: "What are your business hours?",
-            answer: "We are typically open Monday to Friday, 9 AM to 6 PM."
+            answer: "We are available Monday to Friday, 9 AM to 6 PM.",
           },
           {
-            question: "Do you offer custom pricing or packages?",
-            answer: "Please reach out to our team to discuss custom pricing packages suited to your needs."
-          }
+            question: "Do you offer custom plans?",
+            answer: "Yes, contact our sales team for customized solution packages.",
+          },
         ]);
       }
     } catch (error) {
       console.error("Error generating AI questions:", error);
       toast.error("An error occurred while generating AI questions.");
-      
-      // Provide fallback questions
       setGeneratedQuestions([
         {
           question: "What services do you offer?",
-          answer: `We specialize in ${user.bussinessCategory || "various services"} and provide comprehensive solutions.`
+          answer: `We specialize in ${user?.bussinessCategory || "various services"} and provide comprehensive solutions.`,
         },
         {
-          question: "How can I contact you?",
-          answer: "You can reach us through our contact form or customer support."
+          question: "How can I contact support?",
+          answer: "You can reach out to our team through our official support channel.",
         },
-        {
-          question: "What makes your business unique?",
-          answer: user.bussinessDescription || "We are committed to providing excellent service to our customers."
-        },
-        {
-          question: "What are your business hours?",
-          answer: "We are typically open Monday to Friday, 9 AM to 6 PM."
-        },
-        {
-          question: "Do you offer custom pricing or packages?",
-          answer: "Please reach out to our team to discuss custom pricing packages suited to your needs."
-        }
       ]);
     }
 
     setLoading(false);
   };
 
-  const handlePickQuestion = (question) => {
-    setFormData((prev) => ({
-      ...prev,
-      question: question.question,
-      answer: question.answer,
-    }));
-    // scroll to the top
+  const handlePickQuestion = (questionObj) => {
+    setQaList((prev) => {
+      const emptyIndex = prev.findIndex(
+        (item) => !item.question.trim() && !item.answer.trim()
+      );
+      if (emptyIndex !== -1) {
+        const updated = [...prev];
+        updated[emptyIndex] = {
+          ...updated[emptyIndex],
+          question: questionObj.question,
+          answer: questionObj.answer,
+        };
+        return updated;
+      } else {
+        return [
+          ...prev,
+          {
+            id: Date.now() + Math.random(),
+            question: questionObj.question,
+            answer: questionObj.answer,
+          },
+        ];
+      }
+    });
+
     window.scrollTo({ top: 0, behavior: "smooth" });
     setGeneratedQuestions([]);
-
-    setLoading(false);
+    toast.success("AI Question added to form!");
   };
 
   const handleDropdownToggle = (index) => {
@@ -194,11 +273,20 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
   };
 
   useEffect(() => {
-    if (isBusinessDetailsAdded || isBusinessDetailsDeleted) {
+    if (
+      isBusinessDetailsAdded ||
+      isBusinessDetailsUpdated ||
+      isBusinessDetailsDeleted
+    ) {
       dispatch(loadUser());
       dispatch(clearState());
     }
-  }, [isBusinessDetailsAdded, isBusinessDetailsDeleted, dispatch]);
+  }, [
+    isBusinessDetailsAdded,
+    isBusinessDetailsUpdated,
+    isBusinessDetailsDeleted,
+    dispatch,
+  ]);
 
   if (loading) {
     return (
@@ -210,14 +298,19 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen text-gray-700">
-      <div className="bg-white w-full max-w-4xl  rounded-xl shadow-xl relative z-10 transform transition-transform">
-        <CardHeader className="flex justify-between p-6">
-          <CardTitle className="text-2xl  font-semibold text-black-500">
-            Company Details
-          </CardTitle>
+      <div className="bg-white w-full max-w-4xl rounded-xl shadow-xl relative z-10 transform transition-transform">
+        <CardHeader className="flex justify-between items-center p-6 border-b">
+          <div>
+            <CardTitle className="text-2xl font-semibold text-gray-800">
+              Company Details & FAQs
+            </CardTitle>
+            <p className="text-sm text-gray-500 mt-1">
+              Add custom Question and Answer pairs to train your AI chatbot.
+            </p>
+          </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="p-2 text-black hover:text-gray-400 transition-all">
+              <button className="p-2 text-gray-600 hover:text-purple-600 transition-all">
                 <MdInfoOutline className="text-2xl" />
               </button>
             </AlertDialogTrigger>
@@ -226,16 +319,21 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
               <AlertDialogTitle className="text-lg font-semibold mb-2">
                 How to Provide Business Details
               </AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogDescription className="text-gray-300">
                 <p className="mb-4">
-                  To help us train our models effectively, please provide
-                  detailed answers to the following:
+                  To help us train your chatbot effectively, please provide
+                  accurate questions and answers:
                 </p>
-                <ul className="list-disc pl-5 mb-4">
+                <ul className="list-disc pl-5 mb-4 space-y-1">
                   <li>
-                    Enter business-related questions in the "Question" field.
+                    Enter customer questions in the "Question" field.
                   </li>
-                  <li>Provide comprehensive answers in the "Answer" field.</li>
+                  <li>
+                    Provide comprehensive answers in the "Answer" field.
+                  </li>
+                  <li>
+                    Click the <strong>+ Add Question</strong> button to add multiple Q&A fields.
+                  </li>
                 </ul>
               </AlertDialogDescription>
               <div className="mt-4 flex justify-end space-x-2">
@@ -246,103 +344,153 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={(e) => handleSubmit(e)}>
-            <div>
-              <label htmlFor="question" className="block text-sm font-medium">
-                Company Related Question
-              </label>
-              <div className="relative">
-                <Input
-                  id="question"
-                  name="question"
-                  value={formData.question}
-                  onChange={handleChange}
-                  required
-                  placeholder="What is our Company Objective? 🚀"
-                  onFocus={(e) => (e.target.placeholder = "")}
-                  onBlur={(e) =>
-                    (e.target.placeholder = "What is our Company Objective? 🚀")
-                  }
-                  className="mt-2 block w-full border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:ring focus:ring-blue-500"
-                />
-                <FaRobot className="absolute right-3 top-3 text-xl text-[#9e45f1]" />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="answer" className="block text-sm font-medium">
-                Answer
-              </label>
-              <div className="relative">
-                <Textarea
-                  id="answer"
-                  name="answer"
-                  value={formData.answer}
-                  onChange={handleChange}
-                  required
-                  placeholder="Our objective is to provide the best services to our customers... 💼"
-                  onFocus={(e) => (e.target.placeholder = "")}
-                  onBlur={(e) =>
-                    (e.target.placeholder =
-                      "Our objective is to provide the best services to our customers... 💼")
-                  }
-                  rows={4}
-                  className="mt-2 block w-full border border-gray-200 bg-white text-gray-900 placeholder-gray-400  "
-                />
-                <FaCommentDots className="absolute right-3 top-3 text-xl text-[#9e45f1]" />
-              </div>
+
+        <CardContent className="p-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Header for dynamic fields */}
+            <div className="flex justify-between items-center pb-2 border-b">
+              <span className="font-semibold text-gray-700 text-lg">
+                Question & Answer Pairs ({qaList.length})
+              </span>
+              <Button
+                type="button"
+                onClick={handleAddField}
+                variant="outline"
+                className="flex items-center gap-2 border-purple-500 text-purple-600 hover:bg-purple-50 font-medium"
+              >
+                <Plus className="w-4 h-4" /> Add Question
+              </Button>
             </div>
 
-            {/* Generate with AI Button */}
-            <Button
-              type="button"
-              onClick={handleGenerateAI}
-              className="w-full py-3 text-lg font-semibold bg-neon transition-all relative text-white bg-purple-600"
-              style={{
-                background: "linear-gradient(90deg, #FF00FF 0%, #FFA500 100%)",
-              }}
-            >
-              <AiFillThunderbolt className="text-xl mr-2" /> Generate with AI
-            </Button>
+            {/* Dynamic list of Q&A input pairs */}
+            <div className="space-y-6">
+              {qaList.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="p-4 border rounded-xl bg-gray-50/50 space-y-4 relative group"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-purple-600 bg-purple-100 px-2.5 py-1 rounded-full">
+                      Pair #{index + 1}
+                    </span>
+                    {qaList.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveField(item.id)}
+                        className="text-red-500 hover:text-red-700 p-1 transition"
+                        title="Remove field"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
 
-            {loading && (
-              <div className="flex justify-center my-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon"></div>
-              </div>
-            )}
+                  <div>
+                    <label
+                      htmlFor={`question-${item.id}`}
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Question
+                    </label>
+                    <div className="relative">
+                      <Input
+                        id={`question-${item.id}`}
+                        name="question"
+                        value={item.question}
+                        onChange={(e) =>
+                          handleFieldChange(item.id, "question", e.target.value)
+                        }
+                        placeholder="e.g. What is your return policy? 🚀"
+                        className="w-full pr-10 border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-purple-500"
+                      />
+                      <FaRobot className="absolute right-3 top-3 text-xl text-[#9e45f1]" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor={`answer-${item.id}`}
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Answer
+                    </label>
+                    <div className="relative">
+                      <Textarea
+                        id={`answer-${item.id}`}
+                        name="answer"
+                        value={item.answer}
+                        onChange={(e) =>
+                          handleFieldChange(item.id, "answer", e.target.value)
+                        }
+                        placeholder="e.g. We accept returns within 30 days with a full refund... 💼"
+                        rows={3}
+                        className="w-full pr-10 border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-purple-500"
+                      />
+                      <FaCommentDots className="absolute right-3 top-3 text-xl text-[#9e45f1]" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Action Buttons: Add fields & AI generation */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                type="button"
+                onClick={handleAddField}
+                variant="outline"
+                className="w-full sm:w-1/2 py-3 text-md font-semibold border-2 border-purple-500 text-purple-600 hover:bg-purple-50 transition-all flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" /> Add Another Question
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleGenerateAI}
+                className="w-full sm:w-1/2 py-3 text-md font-semibold text-white transition-all flex items-center justify-center gap-2"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #FF00FF 0%, #FFA500 100%)",
+                }}
+              >
+                <AiFillThunderbolt className="text-xl" /> Generate with AI
+              </Button>
+            </div>
 
             {/* Display AI-generated Questions */}
             {generatedQuestions.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold">
+              <div className="mt-4 border p-4 rounded-xl bg-purple-50/40">
+                <h3 className="text-lg font-semibold text-purple-900 mb-2">
                   AI-Generated Questions
                 </h3>
                 <div className="space-y-2">
-                  {generatedQuestions.map((question, index) => (
+                  {generatedQuestions.map((q, index) => (
                     <div
                       key={index}
-                      className="bg-white shadow-xl p-4 rounded-lg"
+                      className="bg-white shadow-sm border p-4 rounded-lg"
                     >
                       <div
-                        className="flex justify-between cursor-pointer"
+                        className="flex justify-between cursor-pointer items-center"
                         onClick={() => handleDropdownToggle(index)}
                       >
-                        <h4 className="font-semibold">{question.question}</h4>
+                        <h4 className="font-semibold text-gray-800">
+                          {q.question}
+                        </h4>
                         <span className="text-gray-400">
                           {selectedQuestionIndex === index ? "▲" : "▼"}
                         </span>
                       </div>
                       {selectedQuestionIndex === index && (
-                        <div className="mt-2 text-gray-300">
-                          {question.answer}
+                        <div className="mt-2 text-gray-600 text-sm border-t pt-2">
+                          {q.answer}
                         </div>
                       )}
                       <Button
                         type="button"
-                        onClick={() => handlePickQuestion(question)}
-                        className="mt-2 bg-[#9e45f1] hover:bg-[#6c2794] rounded-xl text-white  "
+                        onClick={() => handlePickQuestion(q)}
+                        className="mt-3 bg-[#9e45f1] hover:bg-[#6c2794] text-white text-xs px-4 py-1.5 rounded-lg"
                       >
-                        Select
+                        Use This Question
                       </Button>
                     </div>
                   ))}
@@ -350,67 +498,99 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
               </div>
             )}
 
-            {/* Submit Button */}
+            {/* Main Submit Button */}
             <Button
               type="submit"
-              className="w-full py-3 text-lg font-semibold bg-[#9e45f1] hover:bg-[#6c2794]  text-white"
+              className="w-full py-3 text-lg font-semibold bg-[#9e45f1] hover:bg-[#6c2794] text-white transition-all shadow-md"
             >
-              Submit
+              Save All Questions & Answers
             </Button>
           </form>
         </CardContent>
       </div>
 
-      {/* Floating Carousel */}
-      <div className="w-full max-w-4xl mt-8">
+      {/* Floating Carousel / Accordion List */}
+      <div className="w-full max-w-4xl mt-8 mb-12">
         <div className="p-4">
-          {/* Layout Toggle Icons */}
-          <div className="flex justify-end mb-4 space-x-4">
-            <LayoutGrid
-              onClick={() => handleToggleLayout("carousel")}
-              className={`cursor-pointer text-gray-500 hover:text-blue-500 transition ${
-                layout === "carousel" ? "text-blue-500" : ""
-              }`}
-              size={24}
-            />
-            <List
-              onClick={() => handleToggleLayout("accordion")}
-              className={`cursor-pointer text-gray-500 hover:text-blue-500 transition ${
-                layout === "accordion" ? "text-blue-500" : ""
-              }`}
-              size={24}
-            />
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-800">
+              Saved Business Questions ({user?.bussinessDetails?.length || 0})
+            </h3>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => handleToggleLayout("carousel")}
+                className={`p-2 rounded-lg border transition ${
+                  layout === "carousel"
+                    ? "bg-purple-100 border-purple-500 text-purple-600"
+                    : "bg-white border-gray-200 text-gray-500 hover:text-purple-600"
+                }`}
+                title="Carousel Layout"
+              >
+                <LayoutGrid size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleLayout("accordion")}
+                className={`p-2 rounded-lg border transition ${
+                  layout === "accordion"
+                    ? "bg-purple-100 border-purple-500 text-purple-600"
+                    : "bg-white border-gray-200 text-gray-500 hover:text-purple-600"
+                }`}
+                title="List Layout"
+              >
+                <List size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Conditionally render based on selected layout */}
-          {layout === "carousel" ? (
-            <div className="w-full max-w-4xl mt-8">
+          {user?.bussinessDetails?.length === 0 ? (
+            <div className="bg-white p-8 rounded-xl shadow border text-center text-gray-500">
+              No business details added yet. Fill out the form above to train your chatbot.
+            </div>
+          ) : layout === "carousel" ? (
+            <div className="w-full max-w-4xl">
               <Carousel
                 plugins={[
                   Autoplay({
-                    delay: 3000,
+                    delay: 4000,
                   }),
                 ]}
-                className=" rounded-xl shadow-xl overflow-hidden relative  "
+                className="rounded-xl shadow-xl overflow-hidden relative"
               >
                 <CarouselContent>
                   {user?.bussinessDetails?.map((item, index) => (
-                    <CarouselItem key={index}>
-                      <div className="relative p-6 bg-white text-gray-800 rounded-xl  transition-transform transform hover:scale-105 max-h-[35vh] min-h-[35vh]">
-                        <div className="h-full relative group ">
-                          <CardHeader className="flex flex-row align-middle gap-3">
-                            <FaRobot className="text-2xl text-[#9e45f1]" />
-                            <CardTitle className="text-lg">
+                    <CarouselItem key={item._id || index}>
+                      <div className="relative p-6 bg-white text-gray-800 rounded-xl transition-all border max-h-[40vh] min-h-[25vh] flex flex-col justify-between">
+                        <div className="h-full relative group">
+                          <CardHeader className="flex flex-row items-center gap-3 pr-20">
+                            <FaRobot className="text-2xl text-[#9e45f1] shrink-0" />
+                            <CardTitle className="text-lg font-semibold text-gray-900">
                               {item.question}
                             </CardTitle>
                           </CardHeader>
-                          <CardContent className="pt-2">
+                          <CardContent className="pt-2 text-gray-700">
                             <p>{item.answer}</p>
                           </CardContent>
-                          <div className="absolute top-3 right-3">
+
+                          {/* Action Buttons: Edit & Delete */}
+                          <div className="absolute top-3 right-3 flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(item)}
+                              className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
+                              title="Edit Question"
+                            >
+                              <Pencil className="w-5 h-5" />
+                            </button>
+
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <button className="p-2 text-red-400 hover:text-red-200 transition-all">
+                                <button
+                                  type="button"
+                                  className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all"
+                                  title="Delete Question"
+                                >
                                   <MdDeleteOutline className="text-2xl" />
                                 </button>
                               </AlertDialogTrigger>
@@ -418,19 +598,18 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
                                 <AlertDialogTitle className="text-lg font-semibold mb-2">
                                   Delete Confirmation
                                 </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete this detail?
+                                <AlertDialogDescription className="text-gray-300">
+                                  Are you sure you want to delete this business detail?
                                 </AlertDialogDescription>
                                 <div className="mt-4 flex justify-end space-x-2">
                                   <AlertDialogCancel className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
                                     Cancel
                                   </AlertDialogCancel>
-                                  <AlertDialogAction className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                                    <span
-                                      onClick={() => handleDelete(item._id)}
-                                    >
-                                      Delete
-                                    </span>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(item._id)}
+                                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                                  >
+                                    Delete
                                   </AlertDialogAction>
                                 </div>
                               </AlertDialogContent>
@@ -444,30 +623,75 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
               </Carousel>
             </div>
           ) : (
-            <div className="accordion space-y-4">
-              {user?.bussinessDetails.map((detail, index) => (
-                <div key={index} className="border rounded-lg">
+            <div className="space-y-3">
+              {user?.bussinessDetails?.map((detail, index) => (
+                <div
+                  key={detail._id || index}
+                  className="border rounded-xl bg-white shadow-sm overflow-hidden"
+                >
                   <div
                     onClick={() => {
                       const panel = document.getElementById(`panel-${index}`);
-                      panel.classList.toggle("hidden");
+                      if (panel) panel.classList.toggle("hidden");
                     }}
-                    className="flex px-4 py-2 bg-gray-50 rounded-t-lg hover:bg-gray-100 cursor-pointer"
+                    className="flex justify-between items-center px-5 py-3.5 bg-gray-50 hover:bg-gray-100 cursor-pointer transition"
                   >
-                    <button className="w-full text-left ">
+                    <div className="font-medium text-gray-800 pr-4">
                       {detail.question}
-                    </button>
-                    <span className="flex gap-4">
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(detail);
+                        }}
+                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition"
+                        title="Edit"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
 
-                    <ChevronDown />
-                    <Trash2 onClick={() => handleDelete(detail._id)} color="red" className="z-50" />
-                    </span>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-lg transition"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-gray-900 text-white rounded-lg p-6">
+                          <AlertDialogTitle className="text-lg font-semibold mb-2">
+                            Delete Confirmation
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-300">
+                            Are you sure you want to delete this detail?
+                          </AlertDialogDescription>
+                          <div className="mt-4 flex justify-end space-x-2">
+                            <AlertDialogCancel className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(detail._id)}
+                              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    </div>
                   </div>
                   <div
                     id={`panel-${index}`}
-                    className="px-4 py-2 bg-gray-50 hidden rounded-b-lg border-t-2"
+                    className="px-5 py-4 bg-white hidden border-t text-gray-700 text-sm leading-relaxed"
                   >
-                    <p>{detail.answer}</p>
+                    {detail.answer}
                   </div>
                 </div>
               ))}
@@ -475,6 +699,76 @@ Please return an array of exactly 5 questions in JSON format. Each question shou
           )}
         </div>
       </div>
+
+      {/* Edit Dialog Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="bg-white text-gray-900 max-w-lg rounded-xl p-6 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <MdOutlineEdit className="text-purple-600 text-2xl" /> Edit Question & Answer
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-500">
+              Update the question and answer for your chatbot's training context.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdateSubmit} className="space-y-4 mt-4">
+            <div>
+              <label htmlFor="edit-question" className="block text-sm font-medium text-gray-700 mb-1">
+                Question
+              </label>
+              <Input
+                id="edit-question"
+                value={editFormData.question}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    question: e.target.value,
+                  }))
+                }
+                required
+                className="w-full border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="edit-answer" className="block text-sm font-medium text-gray-700 mb-1">
+                Answer
+              </label>
+              <Textarea
+                id="edit-answer"
+                value={editFormData.answer}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    answer: e.target.value,
+                  }))
+                }
+                required
+                rows={4}
+                className="w-full border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <DialogFooter className="flex justify-end space-x-2 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditOpen(false)}
+                className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-none"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#9e45f1] hover:bg-[#6c2794] text-white"
+              >
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
