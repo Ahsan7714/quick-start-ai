@@ -7,8 +7,8 @@ import Footer from './components/Footer';
 import { ChatBot } from 'quickstart-ai-chatbot-widget';
 
 export default function App() {
-  // Use local backend server URL if running, or deployed Vercel URL
-  const backendApiUrl = "http://localhost:3100/api/v1";
+  // Use VITE_API_URL if provided, or default to deployed Vercel backend URL
+  const backendApiUrl = import.meta.env.VITE_API_URL || "https://quick-start-ai-backend.vercel.app/api/v1";
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-slate-100 selection:bg-indigo-500 selection:text-white relative">
