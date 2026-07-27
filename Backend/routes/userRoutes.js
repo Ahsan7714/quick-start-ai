@@ -39,21 +39,7 @@ router
   .route("/me")
   .get(isAuthenticatedUser, loadUserProfile);
 
-
-  // [ADMIN]
-
-  // GET -> get All users
-  // URL -> /api/v1/users
-  // Description -> Get all users by admin
-  // Request Body -> None
-
   router.route("/all").get(isAuthenticatedUser, getAllUsers);
-
-
-  // GET -> get users stats according to monthly 
-  // URL -> /api/v1/users/monthly
-  // Description -> Get all users stats according to monthly by admin
-  // Request Body -> None
 
   router.route("/monthly").get(isAuthenticatedUser, getUsersMonthly);
 

@@ -1,7 +1,6 @@
 "use client"
 import Hero from "@/components/hero";
 import NavBar from "@/components/navbar";
-import Footer from "@/components/footer";
 import About from "@/components/about";
 import Faq from "@/components/faq";
 import Feature from "@/components/feature";
@@ -37,7 +36,6 @@ export default function Home() {
       <section id="faq">
         <Faq />
       </section>
-      <Footer />
 
       {/* Quick Start AI Token "A1ED-7127544F-1EBAF3E7"  */}
 

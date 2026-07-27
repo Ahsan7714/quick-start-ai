@@ -83,12 +83,6 @@ export default function AuthForm() {
         password: "",
       });
 
-      // redirect to user or admin page
-      // if (user && user.role === "user") {
-      //   router.push("/user");
-      // } else if (user && user.role === "admin") {
-      //   router.push("/admin");
-      // }
     }
     if (error) {
       // Show error message
@@ -123,19 +117,14 @@ export default function AuthForm() {
     dispatch(signUp(formData)); 
   };
 
-  // ✅ Replace both useEffects with this single one
-useEffect(() => {
-  dispatch(loadUser());
-}, []); // only on mount
+  useEffect(() => {
+    dispatch(loadUser());
+  }, []); // only on mount
 
-useEffect(() => {
-  if (!user) return; // guard
-  if (user.role === "admin") {
-    router.push("/admin");
-  } else {
+  useEffect(() => {
+    if (!user) return; // guard
     router.push("/user");
-  }
-}, [user]); // only react to user changes
+  }, [user]); // only react to user changes
 
   return (
     <div className="text-black min-h-screen flex items-center justify-center bg-gradient-to-r bg-white py-12 px-4 sm:px-6 lg:px-8">

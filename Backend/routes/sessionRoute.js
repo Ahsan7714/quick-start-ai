@@ -4,7 +4,6 @@ const {
     createSession,
     getAllSessions,
     getMonthlySessions,
-    getAllSessionsMonthlyByAdmin,
     addMessageToSession
 } = require("../controllers/sessionController");
 
@@ -43,12 +42,5 @@ router.route("/owner").get(isAuthenticatedUser,getAllSessions);
 
 router.route("/monthly").get(isAuthenticatedUser,getMonthlySessions);
 
-
-// GET -> get All number of sessions of all chatbot in a month for  all  months by admin
-// URL -> /api/v1/session/monthly/admin
-// Description -> Get all sessions of all chatbot by admin from dashboard
-
-router.route("/monthly/admin").get(isAuthenticatedUser,getAllSessionsMonthlyByAdmin);
- 
 module.exports = router;
 
