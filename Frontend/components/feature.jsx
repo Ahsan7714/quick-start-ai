@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FaClock, FaChartLine, FaHeadset, FaPalette,FaTools,FaChartArea } from 'react-icons/fa';
+import { FaHeadset, FaPalette, FaTools } from 'react-icons/fa';
 
 export default function KeyBenefitsSection() {
   return (
@@ -47,12 +47,6 @@ export default function KeyBenefitsSection() {
             title: "Customization",
             description: "Personalize your experience and make it your own.",
             icon: FaTools,
-          },
-          {
-            title:"Chats Lookup",
-            description:"Search for your chats and get the desired information",
-            icon:FaChartArea,
-
           }
         ].map((benefit, index) => (
           <motion.div
