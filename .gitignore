@@ -47,11 +47,3 @@ next-env.d.ts
 # OS / Editor files
 .vscode/
 .idea/
-
-# Local testing projects
-NexusCloud_Pro/
-Samples/
-Demo_Projects/
-
-
-
