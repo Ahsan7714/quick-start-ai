@@ -11,7 +11,7 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
-    picture,
+
     bussinessName,
     bussinessDescription,
     bussinessCategory,
@@ -35,7 +35,7 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
-    // picture,
+
     bussinessName,
     bussinessCategory,
     bussinessDescription,
@@ -43,7 +43,6 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
   });
 
   // Send token in cookie
-  console.log(user);
   sendToken(user, 200, res, "User registered successfully");
 });
 // login a user
@@ -79,7 +78,7 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
   }
 
   // send token in cookie
-  sendToken(user, 200, res, (message = "User logged in successfully"));
+  sendToken(user, 200, res, "User logged in successfully");
 });
 
 // logout user
