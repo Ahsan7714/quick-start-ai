@@ -3,9 +3,6 @@ import React from 'react';
 import { Button } from "components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import CountUp from 'react-countup';
-import { FaUsers, FaCodeBranch, FaBusinessTime } from 'react-icons/fa'; 
-
 // Motion variants for smooth animation
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -58,50 +55,6 @@ export default function Hero() {
 
       {/* Counter Section with Icons */}
       <motion.div variants={staggerContainer} className=" grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5 px-10">
-  {/* {[ 
-    {
-      countEnd: 100,
-      label: "Users",
-      icon: <FaUsers className="text-purple-600 text-2xl mr-2" />, 
-    },
-    {
-      countEnd: 2000,
-      label: "npm Installs",
-      icon: <FaCodeBranch className="text-purple-600 text-2xl mr-2" />, 
-    },
-    {
-      countEnd: 500,
-      label: "Businesses Helped",
-      icon: <FaBusinessTime className="text-purple-600 text-2xl mr-2" />, 
-    },
-    {
-      countEnd: 1000,
-      label: "Projects Completed",
-      icon: <FaCodeBranch className="text-purple-600 text-2xl mr-2" />,
-    },
-    {
-      countEnd: 1,
-      label: "Total Products",
-      icon: <FaUsers className="text-purple-600 text-2xl mr-2" />,
-    }
-
-  ].map(({ countEnd, label, icon }, index) => (
-    <motion.div
-      key={index}
-      whileHover={{ scale: 1.05 }}
-      variants={fadeInUp}
-      className="flex items-center p-5 bg-white rounded-xl shadow-lg transition-shadow transform hover:shadow-[0_0_15px_5px_rgba(129,90,233,0.5)] hover:bg-gradient-to-r from-purple-50 to-white duration-300"
-    >
-      {icon}
-      <div className="flex flex-col">
-        <h2 className="text-3xl font-bold text-purple-600">
-          <CountUp start={0} end={countEnd} duration={2.5} />
-          {label === "Users" ? "+" : ""}
-        </h2>
-        <p className="mt-2 text-md font-medium text-gray-800">{label}</p>
-      </div>
-    </motion.div>
-  ))} */}
       </motion.div>
     </motion.div>
   );

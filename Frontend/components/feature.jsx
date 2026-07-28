@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaHeadset, FaPalette, FaTools } from 'react-icons/fa';
 

@@ -30,27 +30,6 @@ export async function generateContent(prompt, options = {}) {
   }
 }
 
-/**
- * Generate streaming content (simulate streaming)
- */
-export async function generateContentStream(prompt, onUpdate, options = {}) {
-  try {
-    const response = await generateContent(prompt, options);
-    const words = response.split(' ');
-    let currentContent = '';
-
-    for (let i = 0; i < words.length; i++) {
-      currentContent += (i > 0 ? ' ' : '') + words[i];
-      if (onUpdate) onUpdate(currentContent);
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Streaming Error:', error);
-    throw error;
-  }
-}
 
 /**
  * Generate JSON content
