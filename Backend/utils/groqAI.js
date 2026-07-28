@@ -6,7 +6,7 @@ const Groq = require('groq-sdk');
 class GroqAI {
   constructor() {
     this.client = new Groq({
-      apiKey: process.env.GROQ_API_KEY || process.env.GROK_API_KEY
+      apiKey: process.env.GROQ_API_KEY
     });
   }
 
