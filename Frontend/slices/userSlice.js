@@ -9,7 +9,6 @@ const initialState = {
   isUserLogged: false,
   user: null,
   isTokenGenerated: false,
-  token: null,
   isBusinessDetailsAdded: false,
   isBusinessDetailsUpdated: false,
   isBusinessDetailsDeleted: false,
