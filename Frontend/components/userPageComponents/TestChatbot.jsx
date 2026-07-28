@@ -1,7 +1,6 @@
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Send } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import baseurl from "@/store/baseurl";
 
 const TestChatbot = () => {
@@ -12,8 +11,6 @@ const TestChatbot = () => {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Access user data from Redux store
-  const { user } = useSelector((state) => state.user);
 
   // Scroll to the bottom whenever new messages are added
   useEffect(() => {
