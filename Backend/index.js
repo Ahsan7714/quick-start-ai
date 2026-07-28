@@ -10,8 +10,6 @@ const ErrorHandler = require("./middleware/error");
 
 
 const PORT = process.env.PORT || 3100;
-// require("dotenv").config();
-// Trigger Vercel auto redeploy for new DB connection
 
 require("dotenv").config({ path: "./config/.env" });
 
@@ -35,12 +33,6 @@ app.use(async (req, res, next) => {
     next(err);
   }
 });
-
-
-
-
-
-
 
 app.use(morgan("dev"));
 app.use(compression());
