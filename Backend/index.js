@@ -35,12 +35,7 @@ app.use(async (req, res, next) => {
   }
 });
 
-const allowedOrigins = [
-  'https://quick-start-ai-client.vercel.app'
-];
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
+
 
 
 
@@ -63,12 +58,10 @@ app.use(limiter);
 const userRoutes = require("./routes/userRoutes");
 const chatbotRoutes = require("./routes/chatbotRoute");
 const sessionRoutes = require("./routes/sessionRoute");
-const messageRoutes = require("./routes/messageRoute");
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/chatbot", chatbotRoutes);
 app.use("/api/v1/session", sessionRoutes);
-app.use("/api/v1/message", messageRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is healthy!" });

@@ -2,7 +2,6 @@ const User = require("../models/userModel");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const sendToken = require("../utils/jwtToken");
 const { generateToken } = require("../utils/chatbotToken");
-const Session = require("../models/sessionModel");
 const CustomError = require("../utils/errorHandler");
 require("dotenv").config();
 
