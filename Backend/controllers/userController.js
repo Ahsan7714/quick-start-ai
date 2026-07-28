@@ -3,7 +3,9 @@ const catchAsyncError = require("../middleware/catchAsyncError");
 const sendToken = require("../utils/jwtToken");
 const { generateToken } = require("../utils/chatbotToken");
 const CustomError = require("../utils/errorHandler");
-require("dotenv").config();
+require("dotenv").config();
+
+// register a user
 exports.registerUser = catchAsyncError(async (req, res, next) => {
   const {
     name,
@@ -22,9 +24,13 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
       success: false,
       message: "User already exists",
     });
-  }
+  }
 
-  const chatbot_token = await generateToken();
+  // token for user to access the chatbot and other services
+
+  const chatbot_token = await generateToken();
+
+  // Create a new user
   const user = await User.create({
     name,
     email,
@@ -33,17 +39,24 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
     bussinessCategory,
     bussinessDescription,
     chatbot_token,
-  });
+  });
+
+  // Send token in cookie
   sendToken(user, 200, res, "User registered successfully");
-});
+});
+// login a user
 exports.loginUser = catchAsyncError(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body;
+
+  // check if email and password is entered by user
   if (!email || !password) {
     return res.status(400).json({
       success: false,
       message: "Please enter email & password",
     });
-  }
+  }
+
+  // finding user in database
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
@@ -51,7 +64,9 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
       success: false,
       message: "Invalid Email or Password",
     });
-  }
+  }
+
+  // check if password is correct or not
   const isPasswordMatched = await user.comparePassword(password);
 
   if (!isPasswordMatched) {
@@ -59,35 +74,49 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
       success: false,
       message: "Invalid Email or Password",
     });
-  }
+  }
+
+  // send token in cookie
   sendToken(user, 200, res, "User logged in successfully");
-});
+});
+
+// logout user
 exports.logoutUser = catchAsyncError(async (req, res, next) => {
   res.cookie("token", "", {
     expires: new Date(0),
     path: "/",
     secure: true,
     sameSite: "None",
-  });
+  });
+
+  // Set Cache-Control header to prevent caching
   res.setHeader("Cache-Control", "no-store");
 
   console.log("Cookie cleared.");
   res.status(200).json({ success: true, message: "Logged out successfully" });
-});
-exports.loadUserProfile = catchAsyncError(async (req, res, next) => {
-  const userId = req.params.userId || req.user._id;
+});
+
+// load user profile
+exports.loadUserProfile = catchAsyncError(async (req, res, next) => {
+  // Get the user ID from the request parameters or authentication token
+  const userId = req.params.userId || req.user._id;
+
+  // Check if the user exists
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({
       success: false,
       message: "User not found",
     });
-  }
+  }
+  // Send response with user's profile
   res.status(200).json({
     success: true,
     user,
   });
-});
+});
+
+// add business details (supports single pair or array of pairs)
 exports.addBussinessDetails = catchAsyncError(async (req, res, next) => {
   const { question, answer, details } = req.body;
   const user = req.user;
@@ -128,7 +157,9 @@ exports.addBussinessDetails = catchAsyncError(async (req, res, next) => {
     message: "Business details added successfully",
     bussinessDetails: user.bussinessDetails,
   });
-});
+});
+
+// update business detail
 exports.updateBussinessDetails = catchAsyncError(async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
@@ -155,7 +186,9 @@ exports.updateBussinessDetails = catchAsyncError(async (req, res, next) => {
     message: "Business detail updated successfully",
     bussinessDetails: user.bussinessDetails,
   });
-});
+});
+
+// delete business details
 exports.deleteBussinessDetails = catchAsyncError(async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
@@ -182,7 +215,9 @@ exports.deleteBussinessDetails = catchAsyncError(async (req, res, next) => {
     message: "Business detail deleted successfully",
     bussinessDetails: user.bussinessDetails,
   });
-});
+});
+
+// Return the users details  by finding through the chatbot_token
 
 exports.findChatbotUsingToken = catchAsyncError(async (req, res) => {
   const { token } = req.query;
@@ -211,7 +246,9 @@ exports.findChatbotUsingToken = catchAsyncError(async (req, res) => {
     },
     message: "Chatbot Details"
   })
-});
+});
+
+// Generate  new token for chatbot and replace the old token
 
 exports.generateNewToken = catchAsyncError(async (req, res, next) => {
   const user = req.user;
