@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 const Token = () => {
   const dispatch = useDispatch();
-  const { isTokenGenerated, user, loading, error } = useSelector(state => state.user);
+  const { isTokenGenerated, user, error } = useSelector(state => state.user);
 
   useEffect(() => {
     dispatch(loadUser());

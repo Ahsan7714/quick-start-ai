@@ -14,7 +14,6 @@ const TestChatbot = () => {
 
   // Access user data from Redux store
   const { user } = useSelector((state) => state.user);
-  const chatbotDetails = user || {};
 
   // Scroll to the bottom whenever new messages are added
   useEffect(() => {
