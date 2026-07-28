@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Providers } from "./providers";
+import PlausibleProvider from "next-plausible";
 import { ReduxProvider } from "./redux-provider";
 import { Toaster } from "react-hot-toast";
 
@@ -9,11 +10,14 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || "";
+  const customDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_CUSTOM_DOMAIN;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* add favicon here */}
         <link rel="icon" href="/favicon-32x32.png"/>       
+        {domain && <PlausibleProvider domain={domain} customDomain={customDomain} />}
       </head>
       <body >
         <ReduxProvider>
