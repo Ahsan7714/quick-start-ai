@@ -1,7 +1,6 @@
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Send } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
-import { generateContentStream } from "@/lib/groq";
 import { useSelector } from "react-redux";
 import baseurl from "@/store/baseurl";
 

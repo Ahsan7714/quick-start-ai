@@ -70,25 +70,3 @@ export async function generateJSONContent(prompt, options = {}) {
   }
 }
 
-/**
- * Groq AI Client Wrapper
- */
-export class GroqAI {
-  constructor(config = {}) {
-    this.backendUrl = config.backendUrl || baseurl;
-  }
-
-  async generateContent(prompt, options = {}) {
-    return generateContent(prompt, { ...options, backendUrl: this.backendUrl });
-  }
-
-  async generateContentStream(prompt, onUpdate, options = {}) {
-    return generateContentStream(prompt, onUpdate, { ...options, backendUrl: this.backendUrl });
-  }
-
-  async generateJSONContent(prompt, options = {}) {
-    return generateJSONContent(prompt, { ...options, backendUrl: this.backendUrl });
-  }
-}
-
-export default GroqAI;

@@ -9,7 +9,7 @@ import {
   MessageSquare,
   Coins,
 } from "lucide-react";
-import Chat from "components/userPageComponents/Chat";
+
 import BussinessDetails from "components/userPageComponents/BussinessDetails";
 import Token from "components/userPageComponents/Token";
 import TestChatbot from "components/userPageComponents/TestChatbot";
@@ -175,7 +175,6 @@ export default function UserDashboard() {
         </header>
 
         {/* Render content based on active tab */}
-        {activeTab === "sessions" && <Chat />}
         {activeTab === "business details" && <BussinessDetails />}
         {activeTab === "test chatbot" && <TestChatbot />}
         {activeTab === "token" && <Token />}

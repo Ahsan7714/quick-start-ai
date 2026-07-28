@@ -13,9 +13,6 @@ const initialState = {
   isBusinessDetailsAdded: false,
   isBusinessDetailsUpdated: false,
   isBusinessDetailsDeleted: false,
-  sessions: [],
-  messages: [],
-  data:[],
   isLoggedOut: false,
   isInitialized: false,
 };
@@ -51,6 +48,7 @@ export const login = createAsyncThunk(
     }
   }
 );
+
 // logout user
 export const logout = createAsyncThunk(
   "user/logout",
@@ -65,6 +63,7 @@ export const logout = createAsyncThunk(
     }
   }
 );
+
 // load user
 export const loadUser = createAsyncThunk(
   "user/loadUser",
@@ -85,10 +84,9 @@ export const generateNewToken = createAsyncThunk(
   "user/generateNewToken",
   async (payload, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await axios.post(`${baseurl}/user/token`,payload, {
+      const { data } = await axios.post(`${baseurl}/user/token`, payload, {
         withCredentials: true,
       });
-      // console.log(data);
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -143,68 +141,6 @@ export const deleteBusinessDetails = createAsyncThunk(
   }
 );
 
-
-// get all sessions
-export const getAllSessions = createAsyncThunk(
-  "user/getAllSessions",
-  async (payload, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await axios.get(`${baseurl}/session/owner`, {
-        withCredentials: true,
-      });
-      return fulfillWithValue(data.sessions);
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-// get sessions monthly data
-export const getSessionsMonthlyData = createAsyncThunk(
-  "user/getSessionsMonthlyData",
-  async (payload, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await axios.get(`${baseurl}/session/monthly`, {
-        withCredentials: true,
-      });
-      return fulfillWithValue(data.data);
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-// get all messages
-export const getAllMessages = createAsyncThunk(
-  "user/getAllMessages",
-  async (id, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await axios.get(`${baseurl}/message/session/${id}`, {
-        withCredentials: true,
-      });
-      return fulfillWithValue(data.messages);
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// get bussiness Details 
-
-export const getBussinessDetails=createAsyncThunk(
-  "get/bussiness-details",
-  async(_, {rejectWithValue, fulfillWithValue})=>{
-    try{
-      const {data}=await axios.get(`${baseurl}/user/bussinessDetails`,{
-        withCredentials:true,
-      });
-      return fulfillWithValue(data);
-    }catch(error){
-      return rejectWithValue(error.response.data);
-    }
-  }
-)
-
-
-
 const userReducer = createSlice({
   name: "user",
   initialState,
@@ -215,12 +151,9 @@ const userReducer = createSlice({
       state.isUserLogged = false;
       state.user = null;
       state.isTokenGenerated = false;
-      state.isBusinessDetailsAdded= false;
+      state.isBusinessDetailsAdded = false;
       state.isBusinessDetailsUpdated = false;
       state.isBusinessDetailsDeleted = false;
-      state.sessions = [];
-      state.messages = [];
-      state.data = [];
       state.isLoggedOut = false;
       state.isInitialized = false;
     },
@@ -236,7 +169,9 @@ const userReducer = createSlice({
     });
     builder.addCase(signUp.rejected, (state, action) => {
       state.loading = false;
-state.error = action.payload?.message || action.payload || "Something went wrong";    });
+      state.error = action.payload?.message || action.payload || "Something went wrong";
+    });
+
     // user login
     builder.addCase(login.pending, (state) => {
       state.loading = true;
@@ -249,6 +184,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.loading = false;
       state.error = action?.payload?.message;
     });
+
     // load user
     builder.addCase(loadUser.pending, (state) => {
       state.loading = true;
@@ -262,6 +198,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.loading = false;
       state.isInitialized = true;
     });
+
     // generate new token
     builder.addCase(generateNewToken.pending, (state) => {
       state.loading = true;
@@ -272,8 +209,8 @@ state.error = action.payload?.message || action.payload || "Something went wrong
     });
     builder.addCase(generateNewToken.rejected, (state) => {
       state.loading = false;
-      state.error = action?.payload?.message;
     });
+
     // add business details
     builder.addCase(addBusinessDetails.pending, (state) => {
       state.loading = true;
@@ -288,6 +225,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.error = action?.payload?.message;
       state.isBusinessDetailsAdded = false;
     });
+
     // update business details
     builder.addCase(updateBusinessDetails.pending, (state) => {
       state.loading = true;
@@ -302,6 +240,7 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.error = action?.payload?.message;
       state.isBusinessDetailsUpdated = false;
     });
+
     // delete business details
     builder.addCase(deleteBusinessDetails.pending, (state) => {
       state.loading = true;
@@ -316,39 +255,6 @@ state.error = action.payload?.message || action.payload || "Something went wrong
       state.error = action?.payload?.message;
     });
 
-    // get all sessions
-    builder.addCase(getAllSessions.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllSessions.fulfilled, (state, action) => {
-      state.loading = false;
-      state.sessions = action.payload;
-    });
-    builder.addCase(getAllSessions.rejected, (state) => {
-      state.loading = false;
-    });
-    // get all messages
-    builder.addCase(getAllMessages.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllMessages.fulfilled, (state, action) => {
-      state.loading = false;
-      state.messages = action.payload;
-    });
-    builder.addCase(getAllMessages.rejected, (state) => {
-      state.loading = false;
-    });
-    // get sessions monthly data
-    builder.addCase(getSessionsMonthlyData.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getSessionsMonthlyData.fulfilled, (state, action) => {
-      state.loading = false;
-      state.data = action.payload;
-    });
-    builder.addCase(getSessionsMonthlyData.rejected, (state) => {
-      state.loading = false;
-    });
     // logout user
     builder.addCase(logout.pending, (state) => {
       state.loading = true;
@@ -360,24 +266,8 @@ state.error = action.payload?.message || action.payload || "Something went wrong
     builder.addCase(logout.rejected, (state) => {
       state.loading = false;
     });
-
-    // get bussiness details
-    builder.addCase(getBussinessDetails.pending,(state)=>{
-      state.loading=true;
-    });
-    builder.addCase(getBussinessDetails.fulfilled,(state,action)=>{
-      state.loading=false;
-      // replace all user.bussinessDetails with action.payload
-      state.user.bussinessDetails=action.payload;
-    });
-    builder.addCase(getBussinessDetails.rejected,(state)=>{
-      state.loading=false;
-    });
-
-
-   
   },
 });
 
 export default userReducer.reducer;
-export const { clearState , addNewMessageToMessages } = userReducer.actions;
+export const { clearState } = userReducer.actions;

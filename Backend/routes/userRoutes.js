@@ -9,8 +9,6 @@ const {
   updateBussinessDetails,
   deleteBussinessDetails,
   generateNewToken,
-  getAllUsers,
-  getUsersMonthly,
   findChatbotUsingToken
 } = require("../controllers/userController");
 
@@ -34,18 +32,8 @@ router.route("/bussinessDetails/:id")
 router.route("/token").post(isAuthenticatedUser, generateNewToken);
 router.route("/token/verify").get(findChatbotUsingToken);
 
-// user profile route
 router
   .route("/me")
   .get(isAuthenticatedUser, loadUserProfile);
-
-  router.route("/all").get(isAuthenticatedUser, getAllUsers);
-
-  router.route("/monthly").get(isAuthenticatedUser, getUsersMonthly);
-
-
-  
-
-
 
 module.exports = router;
