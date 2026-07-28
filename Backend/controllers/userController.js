@@ -265,4 +265,3 @@ exports.generateNewToken = catchAsyncError(async (req, res, next) => {
   });
 });
 
-

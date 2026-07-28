@@ -95,7 +95,6 @@ exports.getResponse = catchAsyncError(async (req, res, next) => {
   });
 });
 
-
 exports.testByOwner = catchAsyncError(async (req, res, next) => {
   const owner = req.user;
   const { messages, message } = req.body;

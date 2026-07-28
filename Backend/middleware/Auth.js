@@ -4,14 +4,14 @@ const User = require("../models/userModel")
 
 exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
     const { token } = req.cookies;
-  
+
     if (!token) {
       return res.status(200).json({
         success: false,
         message: "please login to access this resources"
       });
     }
-  
+
     try {
       const decodedData = await jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findOne({ _id: decodedData.id });
@@ -29,5 +29,4 @@ exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
     }
     next();
   });
-
 
