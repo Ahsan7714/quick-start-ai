@@ -35,7 +35,6 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
-
     bussinessName,
     bussinessCategory,
     bussinessDescription,
@@ -223,7 +222,7 @@ exports.deleteBussinessDetails = catchAsyncError(async (req, res, next) => {
 exports.findChatbotUsingToken = catchAsyncError(async (req, res) => {
   const { token } = req.query;
 
-  const user =await User.findOne({ chatbot_token:token });
+  const user = await User.findOne({ chatbot_token: token });
 
   if (!user) {
     throw new CustomError("Invalid Token", 400);
@@ -238,14 +237,14 @@ exports.findChatbotUsingToken = catchAsyncError(async (req, res) => {
   } = user;
 
   res.status(200).json({
-    data:{
+    data: {
       bussinessName,
       bussinessCategory,
       bussinessDescription,
       bussinessDetails,
-      id:_id
+      id: _id
     },
-    message:"Chatbot Details"
+    message: "Chatbot Details"
   })
 });
 
