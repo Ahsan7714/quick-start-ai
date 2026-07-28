@@ -27,7 +27,7 @@ export default function AuthForm() {
     name: "",
     email: "",
     password: "",
-    // picture: "",
+
     bussinessName: "",
     bussinessDescription: "",
     bussinessCategory: "",

@@ -37,15 +37,9 @@ export default function Home() {
         <Faq />
       </section>
 
-      {/* Quick Start AI Token "A1ED-7127544F-1EBAF3E7"  */}
-
-      {/* Quantum Web Solutions "A1ED-F15D1246-2BF76968"  */}
-
-
-      {/* Hot reload triggered */}
       <ChatBot 
         token="A1ED-7127544F-1EBAF3E7" 
-        apiUrl="https://quick-start-ai-backend.vercel.app/api/v1"
+        apiUrl={process.env.NEXT_PUBLIC_API_URL || "https://quick-start-ai-backend.vercel.app/api/v1"}
         theme="secondary"
         wantToShowSuggestions={true}
       />
