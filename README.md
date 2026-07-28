@@ -56,7 +56,6 @@ QuickStart AI is a premium, full-stack SaaS platform designed to empower busines
 - **Styling**: Tailwind CSS & NextUI
 - **Animations**: Framer Motion
 - **Icons**: Lucide React & React Icons
-- **Interactive Charts**: Recharts
 
 ### Backend (Node.js & Express)
 - **Server**: Express.js
