@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { isLoggedOut, loading, user } = useSelector((state) => state.user);
+  const { loading, user } = useSelector((state) => state.user);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

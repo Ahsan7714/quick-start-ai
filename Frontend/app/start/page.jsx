@@ -9,8 +9,7 @@ import {
   Eye,
   EyeOff,
   User,
-  Upload,
-} from "lucide-react"; // Import the Upload icon
+} from "lucide-react";
 import { signUp, login, clearState, loadUser } from "@/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -38,8 +37,6 @@ export default function AuthForm() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [file, setFile] = useState(null); // File state for image upload
-  const [profileImageUrl, setProfileImageUrl] = useState("");
   const toggleAuthMode = () => setIsSignUp(!isSignUp);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -70,8 +67,6 @@ export default function AuthForm() {
         bussinessDescription: "",
         bussinessCategory: "",
       });
-      // emty the image preview
-      setProfileImageUrl("");
     }
     if (isUserLogged) {
       toast.success("User logged in successfully");
@@ -93,17 +88,6 @@ export default function AuthForm() {
   }, [isUserRegistered, isUserLogged, error, dispatch]);
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]; // Get the selected file
-
-    if (file) {
-      const previewUrl = URL.createObjectURL(file); // Create a preview URL from the file
-      setProfileImageUrl(previewUrl); // Set the preview URL for the image
-
-      setFormData({ ...formData, picture: file }); // Set the file to formData.picture
-    }
   };
 
   const handleLogin = (e) => {
@@ -303,15 +287,6 @@ export default function AuthForm() {
                     </div>
                   </div>
 
-                  <div>
-                    {profileImageUrl && (
-                      <img
-                        src={profileImageUrl}
-                        alt="Profile Preview"
-                        className="mt-4 w-32 h-32 object-cover rounded-full"
-                      />
-                    )}
-                  </div>
                 </>
               )}
 

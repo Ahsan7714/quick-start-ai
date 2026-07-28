@@ -2,9 +2,6 @@
 import React, { useState, useEffect } from "react";
 import {
   LogOut,
-  User,
-  Settings,
-  LayoutDashboard,
   Briefcase,
   MessageSquare,
   Coins,
