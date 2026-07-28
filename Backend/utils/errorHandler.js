@@ -3,7 +3,6 @@ class CustomError extends Error{
         super(message);
         this.statusCode = statusCode;
         this.name = this.constructor.name;
-        console.log(`CustomError: message=${message}, statusCode=${statusCode}`);
       }
 }
 module.exports=CustomError
